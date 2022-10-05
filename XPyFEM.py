@@ -173,7 +173,6 @@ class XPyFEM(QMainWindow):
       output.run( self.props , self.globdat )
 
     print("Simulation finished.")
-    sys.exit()
 
   def cancelIt(self):
 

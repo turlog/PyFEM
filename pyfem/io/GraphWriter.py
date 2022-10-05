@@ -30,7 +30,7 @@
 
 from pyfem.util.BaseModule import BaseModule
 from pyfem.util.dataStructures import Properties
-from pylab import plot, show, xlabel, ylabel, draw, ion, figure, gcf
+from pylab import plot, show, xlabel, ylabel, draw, ion, figure, gcf, legend, clf
 from numpy import ndarray,zeros
 
 class GraphWriter( BaseModule ):
@@ -82,7 +82,7 @@ class GraphWriter( BaseModule ):
       self.output = []
 
       xlabel(self.columns[0])
-      ylabel(self.columns[1])
+      ylabel(', '.join(self.columns[1:]))
   
       ion()
 
@@ -129,7 +129,11 @@ class GraphWriter( BaseModule ):
     if self.onScreen: 
       self.output.append( a )
 
-      plot( [x[0] for x in self.output], [x[1] for x in self.output], 'ro-' )
+      clf()
+      X, *curves = zip(*self.output)
+      for Y, label in zip(curves, self.columns[1:]):
+        plot(X, Y, 'o-', label=label)
+      legend(loc='best')
       self.fig.canvas.draw()
     
     if not globdat.active:

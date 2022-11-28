@@ -191,6 +191,7 @@ with open(sys.argv[1], 'rt') as infile:
 
     print('<NodeConstraints>')
     for name, cond in model['boundary'].items():
+        name = model['nodelist'][cond['nsid']]['title']
         for ax, field in {'u': 'dofx', 'v': 'dofy', 'w': 'dofz'}.items():
             print(f'{ax}[{name}] = {0.0 if cond[field] else 1.0};')
     print('</NodeConstraints>')

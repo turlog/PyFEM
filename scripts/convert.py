@@ -1,6 +1,6 @@
 import sys
 import re
-import json
+
 
 def merge(a, b, path=None):
     if b is None:
@@ -176,12 +176,12 @@ with open(sys.argv[1], 'rt') as infile:
 
     print('<Nodes>')
     for nid, (x, y, z) in model['nodes'].items():
-        print(f'{nid} {x} {y} {z}')
+        print(f'{nid} {x} {y} {z};')
     print('</Nodes>')
 
     print('<Elements>')
     for eid, n in model.get('elements', {}).get('solid', {}).items():
-        print(f"{eid} 'Continuum' {' '.join(map(str, n))}")
+        print(f"{eid} 'Continuum' {' '.join(map(str, n))};")
     print('</Elements>')
 
     for nodelist in model['nodelist'].values():
@@ -192,7 +192,7 @@ with open(sys.argv[1], 'rt') as infile:
     print('<NodeConstraints>')
     for name, cond in model['boundary'].items():
         for ax, field in {'u': 'dofx', 'v': 'dofy', 'w': 'dofz'}.items():
-            print(f'{ax}[{name}] = {0.0 if cond[field] else 1.0}')
+            print(f'{ax}[{name}] = {0.0 if cond[field] else 1.0};')
     print('</NodeConstraints>')
 
     print('<ExternalForces>')
@@ -200,5 +200,5 @@ with open(sys.argv[1], 'rt') as infile:
         force = model['curves'][nodeset['lcid']]['sfo']
         coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['lcid']]
         for node in model['nodelist'][nsid]['nodes']:
-            print(f'{coord}[{node}] = {force}')
+            print(f'{coord}[{node}] = {force};')
     print('</ExternalForces>')

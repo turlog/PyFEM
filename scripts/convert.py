@@ -113,7 +113,7 @@ class Parser:
                 ('sid', 'da1', 'da2', 'da3', 'da4', 'solver'),
                 parse_row(data[1], (int, float, float, float, float, str))
             )),
-            'nodes': [node for row in data[2:] for node in map(int, row.split())]
+            'nodes': [node for row in data[2:] for node in map(int, row.split()) if node]
         }
         return {
             'nodelist': {

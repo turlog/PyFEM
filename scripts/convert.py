@@ -174,32 +174,34 @@ with open(sys.argv[1], 'rt') as infile:
     for name, *data in blocks:
         merge(model, parser.parse(name, data))
 
-    print('<Nodes>')
-    for nid, (x, y, z) in model['nodes'].items():
-        print(f'{nid} {x} {y} {z};')
-    print('</Nodes>')
+    with open(sys.argv[2], 'wt') as target:
 
-    print('<Elements>')
-    for eid, n in model.get('elements', {}).get('solid', {}).items():
-        print(f"{eid} 'Continuum' {' '.join(map(str, n))};")
-    print('</Elements>')
-
-    for nodelist in model['nodelist'].values():
-        print(f'<NodeGroup name = "{nodelist["title"]}">')
-        print(f"{{ {' '.join(map(str, nodelist['nodes']))} }}")
-        print('</NodeGroup>')
-
-    print('<NodeConstraints>')
-    for name, cond in model['boundary'].items():
-        name = model['nodelist'][cond['nsid']]['title']
-        for ax, field in {'u': 'dofx', 'v': 'dofy', 'w': 'dofz'}.items():
-            print(f'{ax}[{name}] = {0.0 if cond[field] else 1.0};')
-    print('</NodeConstraints>')
-
-    print('<ExternalForces>')
-    for nsid, nodeset in model.get('nodesets', {}).items():
-        force = model['curves'][nodeset['lcid']]['sfo']
-        coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['lcid']]
-        for node in model['nodelist'][nsid]['nodes']:
-            print(f'{coord}[{node}] = {force};')
-    print('</ExternalForces>')
+        target.write('<Nodes>\n')
+        for nid, (x, y, z) in model['nodes'].items():
+            target.write(f'{nid:5d} {x:15.1f} {y:15.1f} {z:15.1f};\n')
+        target.write('</Nodes>\n\n')
+    
+        target.write('<Elements>\n')
+        for eid, n in sorted(model.get('elements', {}).get('solid', {}).items()):
+            target.write(f"{eid} 'Continuum' {' '.join(map(str, n))};\n")
+        target.write('</Elements>\n\n')
+    
+        for nodelist in model['nodelist'].values():
+            target.write(f'<NodeGroup name = "{nodelist["title"]}">\n')
+            target.write(f"{{ {' '.join(map(str, nodelist['nodes']))} }}\n")
+            target.write('</NodeGroup>\n\n')
+    
+        target.write('<NodeConstraints>\n')
+        for name, cond in model['boundary'].items():
+            name = model['nodelist'][cond['nsid']]['title']
+            for ax, field in {'u': 'dofx', 'v': 'dofy', 'w': 'dofz'}.items():
+                target.write(f'{ax}[{name}] = {0.0 if cond[field] else 1.0};\n')
+        target.write('</NodeConstraints>\n\n')
+    
+        target.write('<ExternalForces>\n')
+        for nsid, nodeset in model.get('nodesets', {}).items():
+            force = model['curves'][nodeset['lcid']]['sfo']
+            coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['lcid']]
+            for node in model['nodelist'][nsid]['nodes']:
+                target.write(f'{coord}[{node}] = {force};\n')
+        target.write('</ExternalForces>\n')

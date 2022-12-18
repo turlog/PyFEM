@@ -201,7 +201,7 @@ with open(sys.argv[1], 'rt') as infile:
         target.write('<ExternalForces>\n')
         for nsid, nodeset in model.get('nodesets', {}).items():
             force = model['curves'][nodeset['lcid']]['sfo']
-            coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['lcid']]
+            coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['dof']]
             for node in model['nodelist'][nsid]['nodes']:
                 target.write(f'{coord}[{node}] = {force};\n')
         target.write('</ExternalForces>\n')

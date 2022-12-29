@@ -1,3 +1,4 @@
+import json
 import sys
 import re
 
@@ -29,15 +30,16 @@ def parse_row(row, spec):
 class Parser:
 
     __ignored_blocks = {
-        'KEYWORD',
         'CONTROL_ACCURACY',
         'CONTROL_IMPLICIT_AUTO',
         'CONTROL_IMPLICIT_DYNAMICS',
         'CONTROL_IMPLICIT_GENERAL',
         'CONTROL_IMPLICIT_SOLUTION',
         'CONTROL_TERMINATION',
+        'DATABASE_BINARY_D',
         'DATABASE_BNDOUT',
         'DATABASE_ELOUT',
+        'DATABASE_EXTENT_BINARY',
         'DATABASE_GCEOUT',
         'DATABASE_GLSTAT',
         'DATABASE_MATSUM',
@@ -50,17 +52,15 @@ class Parser:
         'DATABASE_SLEOUT',
         'DATABASE_SPCFORC',
         'DATABASE_SWFORC',
-        'DATABASE_BINARY_D',
-        'DATABASE_EXTENT_BINARY',
-        'ELEMENT_SHELL',
-        'SECTION_SHELL_TITLE',
+        'END',
+        'KEYWORD',
+        'LOAD_SEGMENT_SET_ID',
         'MAT_ELASTIC_TITLE',
         'MAT_PIECEWISE_LINEAR_PLASTICITY_TITLE',
         'PART',
+        'SECTION_SHELL_TITLE',
         'SECTION_SOLID_TITLE',
         'SET_SEGMENT_TITLE',
-        'LOAD_SEGMENT_SET_ID',
-        'END',
     }
 
     def __init__(self):
@@ -132,6 +132,17 @@ class Parser:
             }
         }
 
+    def parse_element_shell(self, data):
+        items = {}
+        for row in data:
+            eid, _, *nodes = parse_row(row, (int, int, *([int]*4)))
+            items[eid] = nodes
+        return {
+            'elements': {
+                'shell': items
+            }
+        }
+
     def parse_load_node_set(self, data):
         nodesets = {}
         for row in data:
@@ -174,6 +185,8 @@ with open(sys.argv[1], 'rt') as infile:
     for name, *data in blocks:
         merge(model, parser.parse(name, data))
 
+    # print(json.dumps(model))
+
     with open(sys.argv[2], 'wt') as target:
 
         target.write('<Nodes>\n')
@@ -183,6 +196,8 @@ with open(sys.argv[1], 'rt') as infile:
     
         target.write('<Elements>\n')
         for eid, n in sorted(model.get('elements', {}).get('solid', {}).items()):
+            target.write(f"{eid} 'Continuum' {' '.join(map(str, n))};\n")
+        for eid, n in sorted(model.get('elements', {}).get('shell', {}).items()):
             target.write(f"{eid} 'Continuum' {' '.join(map(str, n))};\n")
         target.write('</Elements>\n\n')
     

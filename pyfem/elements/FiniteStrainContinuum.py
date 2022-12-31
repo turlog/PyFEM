@@ -76,16 +76,17 @@ class FiniteStrainContinuum( Element ):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-
   def getTLTangentStiffness ( self, elemdat ):
 
     sData = getElemShapeData( elemdat.coords )
-   
+
     for iData in sData:
 
       self.kin = self.getKinematics( iData.dhdx , elemdat ) 
       B        = self.getBmatrix   ( iData.dhdx , self.kin.F )
       
+      self.kin.dstrain = dot ( B , elemdat.Dstate )
+
       sigma,tang = self.mat.getStress( self.kin )
         
       elemdat.stiff += dot ( B.transpose() , dot ( tang , B ) ) * iData.weight

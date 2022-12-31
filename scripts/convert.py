@@ -17,7 +17,7 @@ def merge(a, b, path=None):
             elif isinstance(a[key], list) and isinstance(b[key], list):
                 a[key].extend(b[key])
             else:
-                raise ValueError('Conflict at %s' % '.'.join(path + [str(key)]))
+                raise ValueError("Conflict at %s" % ".".join(path + [str(key)]))
         else:
             a[key] = b[key]
     return a
@@ -30,145 +30,145 @@ def parse_row(row, spec):
 class Parser:
 
     __ignored_blocks = {
-        'CONTROL_ACCURACY',
-        'CONTROL_IMPLICIT_AUTO',
-        'CONTROL_IMPLICIT_DYNAMICS',
-        'CONTROL_IMPLICIT_GENERAL',
-        'CONTROL_IMPLICIT_SOLUTION',
-        'CONTROL_TERMINATION',
-        'DATABASE_BINARY_D',
-        'DATABASE_BNDOUT',
-        'DATABASE_ELOUT',
-        'DATABASE_EXTENT_BINARY',
-        'DATABASE_GCEOUT',
-        'DATABASE_GLSTAT',
-        'DATABASE_MATSUM',
-        'DATABASE_NCFORC',
-        'DATABASE_NODFOR',
-        'DATABASE_NODOUT',
-        'DATABASE_RCFORC',
-        'DATABASE_RWFORC',
-        'DATABASE_SECFORC',
-        'DATABASE_SLEOUT',
-        'DATABASE_SPCFORC',
-        'DATABASE_SWFORC',
-        'END',
-        'KEYWORD',
-        'LOAD_SEGMENT_SET_ID',
-        'MAT_ELASTIC_TITLE',
-        'MAT_PIECEWISE_LINEAR_PLASTICITY_TITLE',
-        'PART',
-        'SECTION_SHELL_TITLE',
-        'SECTION_SOLID_TITLE',
-        'SET_SEGMENT_TITLE',
+        "CONTROL_ACCURACY",
+        "CONTROL_IMPLICIT_AUTO",
+        "CONTROL_IMPLICIT_DYNAMICS",
+        "CONTROL_IMPLICIT_GENERAL",
+        "CONTROL_IMPLICIT_SOLUTION",
+        "CONTROL_TERMINATION",
+        "DATABASE_BINARY_D",
+        "DATABASE_BNDOUT",
+        "DATABASE_ELOUT",
+        "DATABASE_EXTENT_BINARY",
+        "DATABASE_GCEOUT",
+        "DATABASE_GLSTAT",
+        "DATABASE_MATSUM",
+        "DATABASE_NCFORC",
+        "DATABASE_NODFOR",
+        "DATABASE_NODOUT",
+        "DATABASE_RCFORC",
+        "DATABASE_RWFORC",
+        "DATABASE_SECFORC",
+        "DATABASE_SLEOUT",
+        "DATABASE_SPCFORC",
+        "DATABASE_SWFORC",
+        "END",
+        "KEYWORD",
+        "LOAD_SEGMENT_SET_ID",
+        "MAT_ELASTIC_TITLE",
+        "MAT_PIECEWISE_LINEAR_PLASTICITY_TITLE",
+        "PART",
+        "SECTION_SHELL_TITLE",
+        "SECTION_SOLID_TITLE",
+        "SET_SEGMENT_TITLE",
     }
 
     def __init__(self):
         self.context = {}
 
     def parse_title(self, data):
-        return {
-            'title': data[0]
-        }
+        return {"title": data[0]}
 
     def parse_node(self, data):
         nodes = {}
         for row in data:
             nid, x, y, z = parse_row(row, (int, float, float, float))
             nodes[int(nid)] = (x, y, z)
-        return {
-            'nodes': nodes
-        }
+        return {"nodes": nodes}
 
     def parse_define_curve_title(self, data):
         curve = {
-            'title': data[0],
-            **dict(zip(
-                ('lcid', 'sidr', 'sfa', 'sfo', 'offa', 'offo', 'dattyp', 'lcint'),
-                parse_row(data[1], (int, int, float, float, float, float, int, int)))),
-            'points': [[*map(float, row.split())] for row in data[2:]]
+            "title": data[0],
+            **dict(
+                zip(
+                    ("lcid", "sidr", "sfa", "sfo", "offa", "offo", "dattyp", "lcint"),
+                    parse_row(
+                        data[1], (int, int, float, float, float, float, int, int)
+                    ),
+                )
+            ),
+            "points": [[*map(float, row.split())] for row in data[2:]],
         }
-        return {
-            'curves': {
-                curve.pop('lcid'): curve
-            }
-        }
+        return {"curves": {curve.pop("lcid"): curve}}
 
     def parse_boundary_spc_set_id(self, data):
         return {
-            'boundary': {
-                data[0][1:]: dict(zip(
-                    ('nsid', 'cid', 'dofx', 'dofy', 'dofz', 'dofrx', 'dofry', 'dofrz'),
-                    map(int, data[1].split())
-                ))
+            "boundary": {
+                data[0][1:]: dict(
+                    zip(
+                        (
+                            "nsid",
+                            "cid",
+                            "dofx",
+                            "dofy",
+                            "dofz",
+                            "dofrx",
+                            "dofry",
+                            "dofrz",
+                        ),
+                        map(int, data[1].split()),
+                    )
+                )
             }
         }
 
     def parse_set_node_list_title(self, data):
         # workaround for no whitespace between da4 and solver
-        data[1] = re.sub(r'([0-9])([A-Z]+)$', '\\1 \\2', data[1])
+        data[1] = re.sub(r"([0-9])([A-Z]+)$", "\\1 \\2", data[1])
         nodelist = {
-            'title': data[0],
-            **dict(zip(
-                ('sid', 'da1', 'da2', 'da3', 'da4', 'solver'),
-                parse_row(data[1], (int, float, float, float, float, str))
-            )),
-            'nodes': [node for row in data[2:] for node in map(int, row.split()) if node]
+            "title": data[0],
+            **dict(
+                zip(
+                    ("sid", "da1", "da2", "da3", "da4", "solver"),
+                    parse_row(data[1], (int, float, float, float, float, str)),
+                )
+            ),
+            "nodes": [
+                node for row in data[2:] for node in map(int, row.split()) if node
+            ],
         }
-        return {
-            'nodelist': {
-                nodelist.pop('sid'): nodelist
-            }
-        }
+        return {"nodelist": {nodelist.pop("sid"): nodelist}}
 
     def parse_element_solid(self, data):
         items = {}
         for row in data:
-            eid, _, *nodes = parse_row(row, (int, int, *([int]*8)))
+            eid, _, *nodes = parse_row(row, (int, int, *([int] * 8)))
             items[eid] = nodes
-        return {
-            'elements': {
-                'solid': items
-            }
-        }
+        return {"elements": {"solid": items}}
 
     def parse_element_shell(self, data):
         items = {}
         for row in data:
-            eid, _, *nodes = parse_row(row, (int, int, *([int]*4)))
+            eid, _, *nodes = parse_row(row, (int, int, *([int] * 4)))
             items[eid] = nodes
-        return {
-            'elements': {
-                'shell': items
-            }
-        }
+        return {"elements": {"shell": items}}
 
     def parse_load_node_set(self, data):
         nodesets = {}
         for row in data:
-            nodeset = dict(zip(
-                ('nsid', 'dof', 'lcid', 'sf', 'cid', 'm1', 'm2', 'm3'),
-                parse_row(row, (int, int, int, float, int, int, int, int))
-            ))
-            nodesets[nodeset.pop('nsid')] = nodeset
-        return {
-            'nodesets': nodesets
-        }
+            nodeset = dict(
+                zip(
+                    ("nsid", "dof", "lcid", "sf", "cid", "m1", "m2", "m3"),
+                    parse_row(row, (int, int, int, float, int, int, int, int)),
+                )
+            )
+            nodesets[nodeset.pop("nsid")] = nodeset
+        return {"nodesets": nodesets}
 
     def parse(self, name, data):
-        method = getattr(self, f'parse_{name.lower()}', None)
+        method = getattr(self, f"parse_{name.lower()}", None)
         if callable(method):
             return method(data)
         if name not in self.__ignored_blocks:
             raise ValueError(f'Unknown block: "{name}"')
 
 
-with open(sys.argv[1], 'rt') as infile:
+with open(sys.argv[1], "rt") as infile:
 
     blocks = []
 
-    comment_pattern = re.compile(r'^\s*(\$#|\$\$)\s*(.*)')
-    block_pattern = re.compile(r'^\*([A-Z_]+)')
+    comment_pattern = re.compile(r"^\s*(\$#|\$\$)\s*(.*)")
+    block_pattern = re.compile(r"^\*([A-Z_]+)")
 
     for line in infile:
         if comment_pattern.match(line):
@@ -187,36 +187,36 @@ with open(sys.argv[1], 'rt') as infile:
 
     # print(json.dumps(model))
 
-    with open(sys.argv[2], 'wt') as target:
+    with open(sys.argv[2], "wt") as target:
 
-        target.write('<Nodes>\n')
-        for nid, (x, y, z) in model['nodes'].items():
-            target.write(f'{nid:5d} {x:15.1f} {y:15.1f} {z:15.1f};\n')
-        target.write('</Nodes>\n\n')
-    
-        target.write('<Elements>\n')
-        for eid, n in sorted(model.get('elements', {}).get('solid', {}).items()):
+        target.write("<Nodes>\n")
+        for nid, (x, y, z) in model["nodes"].items():
+            target.write(f"{nid:5d} {x:15.1f} {y:15.1f} {z:15.1f};\n")
+        target.write("</Nodes>\n\n")
+
+        target.write("<Elements>\n")
+        for eid, n in sorted(model.get("elements", {}).get("solid", {}).items()):
             target.write(f"{eid} 'Continuum' {' '.join(map(str, n))};\n")
-        for eid, n in sorted(model.get('elements', {}).get('shell', {}).items()):
+        for eid, n in sorted(model.get("elements", {}).get("shell", {}).items()):
             target.write(f"{eid} 'Continuum' {' '.join(map(str, n))};\n")
-        target.write('</Elements>\n\n')
-    
-        for nodelist in model['nodelist'].values():
+        target.write("</Elements>\n\n")
+
+        for nodelist in model["nodelist"].values():
             target.write(f'<NodeGroup name = "{nodelist["title"]}">\n')
             target.write(f"{{ {' '.join(map(str, nodelist['nodes']))} }}\n")
-            target.write('</NodeGroup>\n\n')
-    
-        target.write('<NodeConstraints>\n')
-        for name, cond in model['boundary'].items():
-            name = model['nodelist'][cond['nsid']]['title']
-            for ax, field in {'u': 'dofx', 'v': 'dofy', 'w': 'dofz'}.items():
-                target.write(f'{ax}[{name}] = {0.0 if cond[field] else 1.0};\n')
-        target.write('</NodeConstraints>\n\n')
-    
-        target.write('<ExternalForces>\n')
-        for nsid, nodeset in model.get('nodesets', {}).items():
-            force = model['curves'][nodeset['lcid']]['sfo']
-            coord = {1: 'u', 2: 'v', 3: 'w'}[nodeset['dof']]
-            for node in model['nodelist'][nsid]['nodes']:
-                target.write(f'{coord}[{node}] = {force};\n')
-        target.write('</ExternalForces>\n')
+            target.write("</NodeGroup>\n\n")
+
+        target.write("<NodeConstraints>\n")
+        for name, cond in model["boundary"].items():
+            name = model["nodelist"][cond["nsid"]]["title"]
+            for ax, field in {"u": "dofx", "v": "dofy", "w": "dofz"}.items():
+                target.write(f"{ax}[{name}] = {0.0 if cond[field] else 1.0};\n")
+        target.write("</NodeConstraints>\n\n")
+
+        target.write("<ExternalForces>\n")
+        for nsid, nodeset in model.get("nodesets", {}).items():
+            force = model["curves"][nodeset["lcid"]]["sfo"] * nodeset["sf"]
+            coord = {1: "u", 2: "v", 3: "w"}[nodeset["dof"]]
+            for node in model["nodelist"][nsid]["nodes"]:
+                target.write(f"{coord}[{node}] = {force};\n")
+        target.write("</ExternalForces>\n")

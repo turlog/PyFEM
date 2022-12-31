@@ -167,7 +167,7 @@ with open(sys.argv[1], 'rt') as infile:
 
     blocks = []
 
-    comment_pattern = re.compile(r'^\s*\$#\s*(.*)')
+    comment_pattern = re.compile(r'^\s*(\$#|\$\$)\s*(.*)')
     block_pattern = re.compile(r'^\*([A-Z_]+)')
 
     for line in infile:

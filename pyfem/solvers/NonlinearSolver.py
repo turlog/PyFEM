@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -74,18 +74,17 @@ class NonlinearSolver( BaseModule ):
       loadTable[1:]      = self.loadTable
       self.loadTable     = loadTable
  
-    logger.info("Starting nonlinear solver .........")
-
 #------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
 
   def run( self , props , globdat ):
 
-    stat = globdat.solverStatus
-    
+    stat = globdat.solverStatus    
     stat.increaseStep()
     
+    self.writeHeader( stat.cycle )
+        
     dofCount = len(globdat.dofs)
     
     a     = globdat.state
@@ -93,13 +92,7 @@ class NonlinearSolver( BaseModule ):
 
     Da[:] = zeros( dofCount )
     fint  = zeros( dofCount ) 
-    
-    logger.info("Nonlinear solver ............")
-    logger.info("    =============================================")
-    logger.info("    Load step %i"%globdat.solverStatus.cycle)
-    logger.info("    =============================================")
-    logger.info('    Newton-Raphson   : L2-norm residual')
-    
+        
     self.setLoadAndConstraints( globdat )
     
     K,fint = assembleTangentStiffness( props, globdat )
@@ -109,6 +102,8 @@ class NonlinearSolver( BaseModule ):
     self.setLoadAndConstraints( globdat )
     
     fext   = assembleExternalForce   ( props, globdat )
+    
+    logger.info('    Newton-Raphson............ : L2-norm residual')    
         
     while error > self.tol:
 
@@ -134,7 +129,7 @@ class NonlinearSolver( BaseModule ):
       else:
         error = globdat.dofs.norm( fext-fint ) / norm
 
-      logger.info('    Iteration %4i   : %6.4e'%(stat.iiter,error) )
+      logger.info('    Iteration %4i ........... : %6.4e'%(stat.iiter,error) )
 
       globdat.dofs.setConstrainFactor( 0.0 )
 
@@ -143,6 +138,8 @@ class NonlinearSolver( BaseModule ):
 
     # Converged
     
+    logger.info('                                 Converged')
+          
     globdat.elements.commitHistory()
 
     Da[:]  = zeros( len(globdat.dofs) )
@@ -151,6 +148,8 @@ class NonlinearSolver( BaseModule ):
     
     if stat.cycle == self.maxCycle or globdat.lam > self.maxLam:
       globdat.active = False 
+      
+    self.writeFooter( globdat )      
 
 #-------------------------------------------------------------------------------
 #

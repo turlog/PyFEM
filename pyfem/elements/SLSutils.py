@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -31,6 +31,7 @@
 from numpy import zeros, dot, outer, ones, eye, sqrt, absolute, linalg,cos,sin,cross
 from scipy.linalg import eigvals,inv
 from math import pi
+
 
 #-------------------------------------------------------------------------------
 #   class SLSparameters
@@ -253,7 +254,7 @@ class LayerData:
        
         layer          =  Layer()
         layer.thick    =  layprops.thickness
-        layer.angle    =  layprops.angle*pi/180
+        layer.theta    =  layprops.theta*pi/180
         
         if hasattr( props , "materials" ):      
           layer.matID  =  props.materials.index(layprops.material)
@@ -267,10 +268,10 @@ class LayerData:
       layer         = Layer()
       layer.thick   = 1.0
       
-      if hasattr( props , "angle" ):
-        layer.angle = props.angle
+      if hasattr( props , "theta" ):
+        layer.theta = props.theta
       else:
-        layer.angle = 0.0
+        layer.theta = 0.0
         
       layer.matID   = 0
 

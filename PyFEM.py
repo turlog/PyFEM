@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel        #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                        #
 #                                                                          #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by            #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by            #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since    #
 #  then augmented and  maintained by Joris J.C. Remmers.                   #
 #  All rights reserved.                                                    #
@@ -35,10 +35,14 @@ import time
 from pyfem.io.InputReader   import InputReader
 from pyfem.io.OutputManager import OutputManager
 from pyfem.solvers.Solver   import Solver
+from pyfem.util.logger      import getLogger
+from pyfem.util.plotUtils   import plotTime
 
 t1 = time.time()
 
 props,globdat = InputReader( sys.argv )
+
+globdat.startTime = t1
 
 solver = Solver        ( props , globdat )
 output = OutputManager ( props , globdat )
@@ -47,12 +51,14 @@ while globdat.active:
   solver.run( props , globdat )
   output.run( props , globdat )
 
-t2 = time.time()
+logger = getLogger()
 
-total = t2-t1
-print("Time elapsed = ",total," [s].\n")
 
-print("PyFem analysis terminated successfully.")
+logger.info("")
+logger.info("=============================================================")
+logger.info("  Total elapsed time.......... : " + plotTime(time.time()-globdat.startTime))  
+logger.info("  PyFem analysis terminated successfully.")
+logger.info("=============================================================")
 
 
 

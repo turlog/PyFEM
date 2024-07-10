@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -29,9 +29,6 @@
 ################################################################################
 
 from pyfem.util.BaseModule import BaseModule
-from pyfem.util.logger   import getLogger
-
-logger = getLogger()
 
 class ContourWriter( BaseModule ):
  
@@ -39,29 +36,26 @@ class ContourWriter( BaseModule ):
 
     self.prefix       = globdat.prefix
     self.interval     = 1
-    self.k            = 0
-
-#    self.stresslabels = [ "sxx" , "syy" , "sxy" ]
 
     BaseModule.__init__( self , props )
+    
+    self.k            = 0
+    self.columndata   = []
 
-    self.columndata = []
-
-#    for i,col in enumerate ( self.columns ):
-#      self.columndata.append( colProps )
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
 	
   def run( self , props , globdat ):
 
     if not globdat.solverStatus.cycle%self.interval == 0:
       return
      
-    logger.info("Writing contour file ......\n")
+    self.writeHeader()
  
     crd = globdat.nodes.getNodeCoords(self.nodes[0])
     outfile = open( self.prefix + '-contour-' + str(self.k) + '.out' ,'w' )
         
-    #tractions = globdat.getData( "tractions" , range(len(globdat.nodes)) )
-
     outfile.write( '#Node  %-10s %-10s' % ('x-coor','y-coor') )
   
     if len(crd) == 3:

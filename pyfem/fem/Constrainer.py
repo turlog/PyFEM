@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -74,8 +74,6 @@ class Constrainer:
     self.constrainedDofs[label].append( dofID )
     
     self.constrainedVals[label].append( addVal )     
-
-    logger.debug("TEST")
 
 #-------------------------------------------------------------------------------
 #
@@ -207,6 +205,15 @@ class Constrainer:
       
 #-------------------------------------------------------------------------------
 #
+#-------------------------------------------------------------------------------
+
+  def setPrescribedDofs( self , a , val = 0.0 ):
+  
+    for name in self.constrainedDofs.keys():             
+      a[self.constrainedDofs[name]] = array( val )
+      
+#-------------------------------------------------------------------------------
+#
 #-------------------------------------------------------------------------------      
 
   def setFactorForDof( self , fac , dofID , label ):
@@ -214,9 +221,9 @@ class Constrainer:
     idx = self.constrainedDofs[label].index(dofID)
     self.constrainedVals[label][idx] += fac
     
-#---------------------------------------------------
+#-------------------------------------------------------------------------------
 #
-#--------------------------------------------------------
+#-------------------------------------------------------------------------------
 
   def slaveCount( self ):
   

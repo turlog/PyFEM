@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -49,8 +49,12 @@ class Contact:
     
     if hasattr( props , 'contact' ):
       if hasattr( props.contact , 'type' ):
-        self.type = props.contact.type
-        self.flag = True
+        self.type      = props.contact.type
+        
+        if self.type == "sphere":
+          self.dispDofs = ["u","v","w"] 
+          
+        self.flag      = True
         self.centre    = np.array(props.contact.centre)
         self.radius    = props.contact.radius
         self.penalty   = props.contact.penalty

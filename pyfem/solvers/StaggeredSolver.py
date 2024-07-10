@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -35,8 +35,6 @@ from pyfem.fem.Assembly import assembleInternalForce, assembleTangentStiffness, 
 from pyfem.fem.Assembly import assembleExternalForce
 from pyfem.util.logger import getLogger
 import sys
-
-logger = getLogger()
 
 #------------------------------------------------------------------------------
 #
@@ -72,8 +70,6 @@ class StaggeredSolver ( BaseModule ):
     
     self.loadfunc = eval ( "lambda t : " + str(self.loadFunc) )
     globdat.solverStatus.dtime = self.dtime
-           
-    logger.info("Starting staggered solver .......")
  
 #------------------------------------------------------------------------------
 #
@@ -86,14 +82,9 @@ class StaggeredSolver ( BaseModule ):
     self.stat = stat
     
     stat.increaseStep()
+    
+    self.writeHeader( stat.cycle )    
 
-    #fext  = zeros( len(globdat.dofs) ) 
-    
-    logger.info("Staggered solver ............")
-    logger.info("    =============================================")
-    logger.info("    Load step %i"%globdat.solverStatus.cycle)
-    logger.info("    =============================================")
-    
     for solver in self.solvers:
            
       stat.iiter = 0

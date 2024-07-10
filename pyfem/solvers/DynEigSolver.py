@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -34,7 +34,7 @@ from numpy import zeros, array, pi
 from pyfem.fem.Assembly import assembleTangentStiffness, assembleMassMatrix
 
 from pyfem.util.logger   import getLogger
-
+from math import sqrt
 import h5py
 
 logger = getLogger()
@@ -57,24 +57,30 @@ class DynEigSolver ( BaseModule ):
 #------------------------------------------------------------------------------
    
   def run( self , props , globdat ):
+  
+    self.writeHeader()   
       
     K,fint  = assembleTangentStiffness( props, globdat )
          
     M,mlump = assembleMassMatrix      ( props , globdat )
 
-    eigenvals , eigenvecs = globdat.dofs.eigensolve( K , M , self.eigenCount )
-
-    globdat.state = eigenvecs
-  
+    eigenvals , globdat.eigenvecs = globdat.dofs.eigensolve( K , M , self.eigenCount )
+    
+    globdat.eigenvals = []
+    
+    for val in eigenvals:
+      globdat.eigenvals.append( sqrt(val) )
+         
     globdat.elements.commitHistory()
 
     globdat.active = False 
     
     h5file = h5py.File( "modes.h5", 'w')
     
-    h5file.create_dataset("modes", eigenvecs.shape, dtype='f', data=eigenvecs)   
+    h5file.create_dataset("modes", globdat.eigenvecs.shape, 
+                          dtype='f', data=globdat.eigenvecs)   
   
-    self.printResults( eigenvals )
+    self.printResults( globdat.eigenvals )
 
 #------------------------------------------------------------------------------
 #
@@ -82,13 +88,13 @@ class DynEigSolver ( BaseModule ):
 
   def printResults( self , eigenvals):
 
-    logger.info("Dynamic Eigen Solver ........")
+
     logger.info("    =============================================")
     logger.info('   Eigenfrequencies')
     logger.info("    =============================================")
     logger.info('   Mode |   Eigenvalue       |  Frequency')
         
-    for i,f in enumerate(eigenvals):
-      logger.info('   %4i |   %6.4e rad/s |  %6.4e Hz' %(i+1,f,f/(2.0*pi)))
+    for i,val in enumerate(eigenvals):
+      logger.info('   %4i |   %6.4e rad/s |  %6.4e Hz' %(i+1,val,val/(2.0*pi)))
       
     logger.info('  ================================================\n')

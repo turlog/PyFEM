@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -29,9 +29,6 @@
 ################################################################################
 
 from pyfem.util.BaseModule import BaseModule
-from pyfem.util.logger   import getLogger
-
-logger = getLogger()
 
 #------------------------------------------------------------------------------
 #
@@ -58,8 +55,8 @@ class MeshWriter ( BaseModule ):
     
     if not globdat.solverStatus.cycle%self.interval == 0:
       return
-
-    logger.info("Writing mesh .................")
+      
+    self.writeHeader( globdat.solverStatus.cycle )
 
     dim = globdat.state.ndim    
 

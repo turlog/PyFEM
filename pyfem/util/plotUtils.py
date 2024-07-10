@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -30,8 +30,37 @@
 
 from pylab import plot, show, xlabel, ylabel
 
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+
+
 def plotCurve( output ):
 
   plot( [x[0] for x in output], [x[1] for x in output], 'r-o' )
 
   show()
+  
+  
+#-
+#
+#----------------
+
+
+def plotTime( t ):
+
+    if t < 0.1:
+        return f"{t:.1e} sec."
+    elif t < 60.0:
+        return f"{t:.3f} sec."
+    elif t < 3600.0:
+        minutes = int(t // 60 )
+        seconds = t % 60
+        return f"{minutes} min. {seconds:.2f} sec."
+    else:
+        hours   = int(t // 3600 )
+        minutes = int((t % 3600 ) // 60 )
+        seconds = t % 60
+        return f"{hours} hrs. {minutes} min. {seconds:.2f} sec."    
+

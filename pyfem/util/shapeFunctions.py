@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -274,38 +274,20 @@ def getShapeQuad9 ( xi ):
   sData.h     = empty( 9 )
   sData.dhdxi = empty( shape=(9,2) )
   sData.xi    = xi
+  
+  nodeMap = array([[0,1,2],[7,8,3],[6,5,4]])
+   
+  s0  = getShapeLine3( xi[0] )
+  s1  = getShapeLine3( xi[1] )
 
-  #Calculate shape functions
-  sData.h[0] = -0.25*(1.0-xi[0])*(1.0-xi[1])*(1.0+xi[0]+xi[1])
-  sData.h[1] =  0.5 *(1.0-xi[0])*(1.0+xi[0])*(1.0-xi[1])
-  sData.h[2] = -0.25*(1.0+xi[0])*(1.0-xi[1])*(1.0-xi[0]+xi[1])
-  sData.h[3] =  0.5 *(1.0+xi[0])*(1.0+xi[1])*(1.0-xi[1])
-  sData.h[4] = -0.25*(1.0+xi[0])*(1.0+xi[1])*(1.0-xi[0]-xi[1])
-  sData.h[5] =  0.5 *(1.0-xi[0])*(1.0+xi[0])*(1.0+xi[1])
-  sData.h[6] = -0.25*(1.0-xi[0])*(1.0+xi[1])*(1.0+xi[0]-xi[1])
-  sData.h[7] =  0.5 *(1.0-xi[0])*(1.0+xi[1])*(1.0-xi[1])
-  sData.h[8] =  0.5 *(1.0-xi[0])*(1.0+xi[1])*(1.0-xi[1])
+  for i in range(3):
+    for j in range(3):
+      iNod = nodeMap[i,j]
 
-  #Calculate derivatives of shape functions
-  sData.dhdxi[0,0] = -0.25*(-1.0+xi[1])*( 2.0*xi[0]+xi[1])
-  sData.dhdxi[1,0] =  xi[0]*(-1.0+xi[1])
-  sData.dhdxi[2,0] =  0.25*(-1.0+xi[1])*(-2.0*xi[0]+xi[1])
-  sData.dhdxi[3,0] = -0.5 *(1.0+xi[1])*(-1.0+xi[1])
-  sData.dhdxi[4,0] =  0.25*( 1.0+xi[1])*( 2.0*xi[0]+xi[1])
-  sData.dhdxi[5,0] = -xi[0]*(1.0+xi[1])
-  sData.dhdxi[6,0] = -0.25*( 1.0+xi[1])*(-2.0*xi[0]+xi[1])
-  sData.dhdxi[7,0] = 0.5*(1.0+xi[1])*(-1.0+xi[1])
-  sData.dhdxi[8,0] = 0.5*(1.0+xi[1])*(-1.0+xi[1])
+      sData.h[iNod]       = s0.h[i]*s1.h[j]   
+      sData.dhdxi[iNod,0] = s0.h[i]*s1.dhdxi[0,j]
+      sData.dhdxi[iNod,1] = s0.dhdxi[0,i]*s1.h[j]
 
-  sData.dhdxi[0,1] = -0.25*(-1.0+xi[0])*( xi[0]+2.0*xi[1])
-  sData.dhdxi[1,1] =  0.5 *( 1.0+xi[0])*(-1.0+xi[0])
-  sData.dhdxi[2,1] =  0.25*( 1.0+xi[0])*(-xi[0]+2.0*xi[1])
-  sData.dhdxi[3,1] = -xi[1]*(1.0+xi[0])
-  sData.dhdxi[4,1] =  0.25*( 1.0+xi[0])*( xi[0]+2.0*xi[1])
-  sData.dhdxi[5,1] = -0.5 *( 1.0+xi[0])*(-1.0+xi[0])
-  sData.dhdxi[6,1] = -0.25*(-1.0+xi[0])*(-xi[0]+2.0*xi[1])
-  sData.dhdxi[7,1] =  xi[1]*(-1.0+xi[0])
-  sData.dhdxi[8,1] =  xi[1]*(-1.0+xi[0])
   return sData
 
 #----------------------------------------------------------------------

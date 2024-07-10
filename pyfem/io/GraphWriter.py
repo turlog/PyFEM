@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -30,8 +30,9 @@
 
 from pyfem.util.BaseModule import BaseModule
 from pyfem.util.dataStructures import Properties
-from pylab import plot, show, xlabel, ylabel, draw, ion, figure, gcf, legend, clf
 from numpy import ndarray,zeros
+
+import matplotlib.pyplot as plt
 
 class GraphWriter( BaseModule ):
 
@@ -67,24 +68,18 @@ class GraphWriter( BaseModule ):
 
       self.columndata.append( colProps )
 
-    if self.onScreen and hasattr( globdat , "onScreen" ):
-      self.onScreen = False
-    else:
+    if self.onScreen:
       globdat.onScreen = True
 
-      self.fig = gcf()
-      self.fig.show()
-      self.fig.canvas.draw()
-
+      self.fig = plt.figure(figsize=(3,4), dpi=160)
+      self.ax1 = plt.subplot()
+      
     self.outfile = open( self.filename ,'w' )
 
     if self.onScreen:
       self.output = []
-
-      xlabel(self.columns[0])
-      ylabel(', '.join(self.columns[1:]))
-  
-      ion()
+      
+    self.outfile = open( self.filename ,'w' )      
 
     self.run( props , globdat ) 
 
@@ -93,7 +88,9 @@ class GraphWriter( BaseModule ):
 #------------------------------------------------------------------------------
 
   def run( self , props , globdat ):
-
+     
+    self.writeHeader()
+    
     a = []
 
     for i,col in enumerate(self.columndata):
@@ -126,15 +123,20 @@ class GraphWriter( BaseModule ):
 
     self.outfile.write('\n')
 
-    if self.onScreen: 
-      self.output.append( a )
-
-      clf()
-      X, *curves = zip(*self.output)
-      for Y, label in zip(curves, self.columns[1:]):
-        plot(X, Y, 'o-', label=label)
-      legend(loc='best')
-      self.fig.canvas.draw()
+    self.output.append( a )
+      
+    if self.onScreen:    
+      plt.sca(self.ax1)
+      plt.cla()
+      
+      plt.xlabel(self.columns[0])
+      plt.ylabel(self.columns[1])   
+      
+      plt.plot([x[0] for x in self.output], [x[1] for x in self.output], 'ro-' )
+    
+      plt.pause(0.001)
+      
+    self.fig.savefig(self.prefix+'.png')
     
     if not globdat.active:
       self.outfile.close

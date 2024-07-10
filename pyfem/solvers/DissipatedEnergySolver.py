@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -31,7 +31,7 @@
 ################################################################################
 #  This solver is presented in detail in the following paper:                  #
 #                                                                              #
-#  E.Borjesson, J.J.C. Remmers, M. Fagerstrom (2022) A generalised             #  
+#  E.Borjesson, J.J.C. Remmers, M. Fagerstrom (2023) A generalised             #  
 #    path-following solver for robust analysis of material failure,            #
 #    Computational Mechanics, doi: 10.1007/s00466-022-02175-w                  #
 #                                                                              #
@@ -80,13 +80,13 @@ class DissipatedEnergySolver( BaseModule ):
 
   def run( self , props , globdat ):
 
-    stat = globdat.solverStatus
-    
+    stat = globdat.solverStatus    
     stat.increaseStep()
+    
+    self.writeHeader( stat.cycle )
    
     a    = globdat.state
     Da   = globdat.Dstate
-    #fhat = globdat.fhat
     
     fhat = assembleExternalForce( props, globdat )  
  
@@ -103,7 +103,6 @@ class DissipatedEnergySolver( BaseModule ):
       Da1    = self.factor * self.Daprev
       Dlam   = self.factor * self.Dlamprev
       globdat.lam += Dlam
-
 
     a [:] += Da1[:]
     Da[:] =  Da1[:]
@@ -199,18 +198,15 @@ class DissipatedEnergySolver( BaseModule ):
 
     if globdat.lam > self.maxLam or stat.cycle > self.maxCycle:
       globdat.active=False
-
-
+      
+    self.writeFooter( globdat )       
+ 
 #------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
 
   def printHeader( self , cycle):
 
-    logger.info("Dissipated Energy Solver ....")
-    logger.info("    =============================================")
-    logger.info("    Load step %i"%cycle)
-    logger.info("    =============================================") 
     logger.info('    Newton-Raphson   : L2-norm residual')
 
 #------------------------------------------------------------------------------

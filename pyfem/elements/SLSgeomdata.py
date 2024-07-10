@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel        #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                        #
 #                                                                          #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by            #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by            #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since    #
 #  then augmented and  maintained by Joris J.C. Remmers.                   #
 #  All rights reserved.                                                    #
@@ -121,7 +121,7 @@ class SLSgeomdata():
 
       for ldat in self.layerData:
         ldatnew          = layData()
-        ldatnew.angle    = ldat.angle
+        ldatnew.theta    = ldat.theta
         ldatnew.matID    = ldat.matID
         ldatnew.zetaData = []
   
@@ -182,14 +182,14 @@ class SLSgeomdata():
       T[:,1] = unit(cross(  T[:,2] , T[:,0] ) )   
       T[:,0] = unit(cross(  T[:,1] , T[:,2] ) )
 
-      for ldat in sdat.layerData:
+      for ldat in sdat.layerData:        
         ldat.lamb = zeros( shape = ( 3 , 3 ) )
 
-        lax[0,0] = cos( ldat.angle )
-        lax[1,0] = sin( ldat.angle )
+        lax[0,0] = cos( ldat.theta )
+        lax[1,0] = sin( ldat.theta )
 
-        lax[0,1] = cos( ldat.angle + 0.5*pi )
-        lax[1,1] = sin( ldat.angle + 0.5*pi )
+        lax[0,1] = cos( ldat.theta + 0.5*pi )
+        lax[1,1] = sin( ldat.theta + 0.5*pi )
 
         lax[2,2] = 1.0
 

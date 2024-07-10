@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -109,7 +109,8 @@ class DofSpace:
     
   def readFromFile( self, fname ):
       
-    logger.info("Reading constraints ..........")
+    logger.info("  Reading constraints")
+    logger.info("  -----------------------------------------------------------")  
 
     nodeTable = readNodeTable( fname , "NodeConstraints" , self.nodes )
    
@@ -272,7 +273,7 @@ class DofSpace:
     '''Returns all dofIDs for a list of nodes'''
     
     return self.dofs[self.IDmap.get(nodeIDs)].flatten()
- 
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -368,3 +369,20 @@ class DofSpace:
       constrainer = self.cons
     
     return scipy.linalg.norm( constrainer.C.transpose() * r )
+    
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+
+  def maskPrescribed( self, a, val = 0.0 , constrainer = None  ):
+  
+    '''
+    Replaced the prescribed dofs by val
+    '''
+    
+    if constrainer is None:
+      constrainer = self.cons
+    
+    a[constrainer.constrainedDofs["None"]] = val
+    
+    return a

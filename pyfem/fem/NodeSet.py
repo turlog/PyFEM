@@ -5,7 +5,7 @@
 #    R. de Borst, M.A. Crisfield, J.J.C. Remmers and C.V. Verhoosel            #
 #    John Wiley and Sons, 2012, ISBN 978-0470666449                            #
 #                                                                              #
-#  Copyright (C) 2011-2022. The code is written in 2011-2012 by                #
+#  Copyright (C) 2011-2024. The code is written in 2011-2012 by                #
 #  Joris J.C. Remmers, Clemens V. Verhoosel and Rene de Borst and since        #
 #  then augmented and maintained by Joris J.C. Remmers.                        #
 #  All rights reserved.                                                        #
@@ -60,7 +60,8 @@ class NodeSet( itemList ):
     
   def readFromFile( self, fname ):
     
-    logger.info("Reading nodes ................")
+    logger.info("  Reading nodes")
+    logger.info("  -----------------------------------------------------------")    
 
     fin = open( fname , 'r' )
     
@@ -141,16 +142,16 @@ class NodeSet( itemList ):
 #-------------------------------------------------------------------------------
 
   def __repr__( self ):
-    msg =  "Number of nodes ............ %6d\n" % len(self)
+    msg =  "  Number of nodes ............ %6d\n" % len(self)
     
     if len(self.groups) > 0:
-      msg += "  Number of  groups .......... %6d\n" % len(self.groups)
-      msg += "  -----------------------------------\n"
-      msg += "    name                       #nodes\n"
-      msg += "    ---------------------------------\n"
+      msg += "    Number of  groups .......... %6d\n" % len(self.groups)
+      msg += "    -----------------------------------\n"
+      msg += "      name                       #nodes\n"
+      msg += "      ---------------------------------\n"
       
       for name in self.groups:
-        msg += "    %-16s           %6d \n" % (name,len(self.groups[name]))
+        msg += "      %-16s           %6d \n" % (name,len(self.groups[name]))
     
     return msg
     
